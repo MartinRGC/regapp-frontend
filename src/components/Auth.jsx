@@ -24,7 +24,7 @@ export default function Auth() {
       alert('❌ Error de login');
     },
     flow: 'auth-code',
-    scope: 'https://www.googleapis.com/auth/spreadsheets'
+    scope: 'openid email profile'
   });
 
   return (
