@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
-import { 
-  User, Mail, Phone, Search, Plus, Edit, Trash2, 
-  Folder, X, Save, Loader2 
-} from 'lucide-react';
+import { User, Mail, Phone, MapPin, Search, Plus, 
+  Edit, Trash2, Folder, X, Save, Loader2 } from 'lucide-react';
 import './App.css';
 
 function App() {
@@ -13,13 +11,14 @@ function App() {
   const [showForm, setShowForm] = useState(false);
   const [editingContact, setEditingContact] = useState(null);
 
-  // Estado del formulario
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    category_id: ''
-  });
+  // En el estado del formulario
+const [formData, setFormData] = useState({
+  name: '',
+  email: '',
+  phone: '',
+  address: '', 
+  category_id: ''
+});
 
   // Cargar contactos y categorías al montar
   useEffect(() => {
@@ -81,6 +80,7 @@ function App() {
       name: '',
       email: '',
       phone: '',
+      address: '', 
       category_id: ''
     });
     setShowForm(true);
@@ -93,6 +93,7 @@ function App() {
       name: contact.name,
       email: contact.email || '',
       phone: contact.phone || '',
+      address: contact.extra_data?.address || '',
       category_id: contact.category_id
     });
     setShowForm(true);
@@ -115,6 +116,11 @@ function App() {
         },
         body: JSON.stringify(formData)
       });
+
+      const extra_data = {
+        address: formData.address.trim() || null
+      };
+
       
       if (!response.ok) throw new Error('Error al guardar contacto');
       
@@ -154,7 +160,8 @@ function App() {
     searchTerm === '' ||
     contact.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     contact.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    contact.phone?.includes(searchTerm)
+    contact.phone?.includes(searchTerm) ||
+    contact.extra_data?.address?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -203,6 +210,7 @@ function App() {
                     <th><Mail size={16} /> Email</th>
                     <th><Phone size={16} /> Teléfono</th>
                     <th><Folder size={16} /> Categoría</th>
+                    <th><MapPin size={16} /> Dirección</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
@@ -212,6 +220,7 @@ function App() {
                       <td>{contact.name}</td>
                       <td>{contact.email || '-'}</td>
                       <td>{contact.phone || '-'}</td>
+                      <td>{contact.extra_data?.address || '-'}</td>
                       <td>
                         {categories.find(c => c.id === contact.category_id)?.name || 'Sin categoría'}
                       </td>
@@ -282,6 +291,17 @@ function App() {
                 value={formData.phone}
                 onChange={handleInputChange}
                 placeholder="999-888-777"
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Dirección</label>
+              <input
+                type="text"
+                name="address"
+                value={formData.address}
+                onChange={handleInputChange}
+                placeholder="Calle 123, Ciudad"
               />
             </div>
 
