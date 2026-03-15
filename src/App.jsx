@@ -10,6 +10,9 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingContact, setEditingContact] = useState(null);
+  const [showCategoryForm, setShowCategoryForm] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
+
 
   // En el estado del formulario
 const [formData, setFormData] = useState({
@@ -154,7 +157,25 @@ const [formData, setFormData] = useState({
       alert('❌ Error al eliminar contacto');
     }
   };
-
+  const handleCreateCategory = async () => {
+    try {
+      const response = await fetch('https://regapp-backend.martingarcia08-00.workers.dev/api/categories', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer temp-token'
+        },
+        body: JSON.stringify({ name: newCategoryName.trim() })
+      });
+      
+      if (!response.ok) throw new Error('Error al crear categoría');
+      fetchCategories();
+      setNewCategoryName('');
+      setShowCategoryForm(false);
+    } catch (error) {
+      alert('❌ Error al crear categoría');
+    }
+  };
   // Filtrar contactos por búsqueda
   const filteredContacts = contacts.filter(contact => 
     searchTerm === '' ||
@@ -307,20 +328,47 @@ const [formData, setFormData] = useState({
 
             <div className="form-group">
               <label>Categoría *</label>
-              <select
+              <div className="category-input-container">
+                <select
                 name="category_id"
                 value={formData.category_id}
                 onChange={handleInputChange}
                 required
-              >
-                <option value="">Seleccionar...</option>
-                {categories.map(category => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+                >
+                  <option value="">Seleccionar...</option>
+                  {categories.map(category => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                      </option>
+                    ))}
+                    </select>
+                    <button 
+                    type="button" 
+                    className="btn-create-category"
+                    onClick={() => setShowCategoryForm(true)}
+                    >
+                      + Nueva
+                    </button>
+                  </div>
+
+                  {showCategoryForm && (
+                    <div className="category-form">
+                      <input
+                      type="text"
+                      placeholder="Nombre de la nueva categoría"
+                      value={newCategoryName}
+                      onChange={(e) => setNewCategoryName(e.target.value)}
+                    />
+                    <button 
+                    type="button" 
+                    className="btn-category"
+                    onClick={handleCreateCategory}
+                >
+                  Guardar
+                </button>
+              </div>
+            )}
+      </div>
 
             <div className="modal-footer">
               <button onClick={() => setShowForm(false)} className="btn-cancel">
